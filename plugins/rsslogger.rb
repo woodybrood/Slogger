@@ -24,7 +24,7 @@ class RSSLogger < Slogger
     feeds = []
     if @config.key?(self.class.name)
       @rssconfig = @config[self.class.name]
-      if !@rssconfig.key?('feeds') || @rssconfig['feeds'] == []
+      if !@rssconfig.key?('feeds') || @rssconfig['feeds'] == [] || @rssconfig['feeds'].nil?
         @log.warn("RSS feeds have not been configured or a feed is invalid, please edit your slogger_config file.")
         return
       else
@@ -63,9 +63,25 @@ class RSSLogger < Slogger
 
     today = @timespan
     begin
+
       rss_content = ""
-      open(rss_feed) do |f|
-        rss_content = f.read
+
+      if rss_feed =~ /^https/
+        url = URI.parse(rss_feed)
+
+        http = Net::HTTP.new url.host, url.port
+        http.verify_mode = OpenSSL::SSL::VERIFY_NONE
+        http.use_ssl = true
+
+        res = nil
+
+        http.start do |agent|
+          rss_content = agent.get(url.path).read_body
+        end
+      else
+        open(rss_feed) do |f|
+          rss_content = f.read
+        end
       end
 
       rss = RSS::Parser.parse(rss_content, false)

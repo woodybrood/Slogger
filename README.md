@@ -6,24 +6,45 @@ Support Slogger by contributing to my [GitTip fund](https://www.gittip.com/ttsco
 
 ## Description ##
 
-Slogger indexes various public social services and creates Day One (<http://dayoneapp.com/>) journal entries for them. It allows you to keep a personal journal that collects your online social life automatically, all in one place.
+Slogger indexes various public social services and creates Day One (<http://dayoneapp.com/>) journal entries or plain text Markdown files for them. It allows you to keep a personal journal that collects your online social life automatically, all in one place.
 
 ## Features ##
 
 - Slogger 2.x uses a plugin architecture to allow easy extension
     - Default plugins:
-        -  Gist (gists created in the last 24 hours. Title and description only, logged as a single digest)
-        -  Flickr (images uploaded in the last 24 hours, each as an individual post. Can handle multiple accounts)
-        -  Last.fm (Scrobbled songs for the current day)
-        -  Blog entries (designed to pull in your blog posts with leading image and excerpt (optionally markdownified). Handles multiple feeds)
-        -  RSS Feeds (logs any feed entries for the given timespan as a digest entry, handles multiple feeds)
-        -  Twitter (Tweets and Favorites for the day as digest entries, handles multiple Twitter accounts)
-        -  Instapaper (Unread and/or individual folders)
-        -  Foursquare (Checkins for the day)
-        -  Pinboard (Daily digest with descriptions and option for tags)
-        -  Pocket (Digest list of links, read and unread, posted to Pocket)
-        -  Goodreads books marked read for the day, one entry each with book cover image, ratings and your review. Inserted at the date marked finished.
+        -  Github
+            -  new plugin, supercedes Gist logger. 
+            -  Logs push, watch and gist activity
+        -  Flickr
+            - images uploaded in the last 24 hours, each as an individual post
+            - Can handle multiple accounts
+        -  Last.fm 
+            - Scrobbled songs for the current day
+            - *updated to grab more songs*
+        -  Blog entries
+            -  designed to pull in your blog posts with leading image and excerpt (optionally markdownified). 
+            -  Handles multiple feeds
+        -  RSS Feeds
+            -  logs any feed entries for the given timespan as a digest entry
+            -  handles multiple feeds
+        -  Twitter
+            -  Tweets and Favorites for the day as digest entries
+            -  handles multiple Twitter accounts
+        -  Instapaper
+            -  Unread and/or individual folders
+        -  Foursquare 
+            -  Checkins for the day
+        -  Pinboard 
+            -  Daily digest with descriptions
+            -  optionally include bookmark tags in entry
+        -  Pocket
+            -  Digest list of links---read and unread---posted to Pocket
+        -  Goodreads 
+            -  books marked read for the day, one entry each with book cover image, ratings and your review. 
+            -  Inserted at the date marked finished.
         -  App.net
+            -  App.net posts for the current day    
+        -  OmniFocus complete tasks for the day
 - Slogger can be called with a single argument that is a path to a local image or text file, and an entry will be created containing its contents.
     - You can use this with a folder action or launchd task to add files from a folder connected to something like <http://IFTTT.com>. Any images added to the watched folder will be turned into journal entries.
         -  Note that Slogger does not delete the original file, so your script needs to move files out of the folder manually to avoid double-processing.
@@ -33,8 +54,10 @@ Slogger indexes various public social services and creates Day One (<http://dayo
 1. From within the Slogger folder, run `./slogger` to create the initial configuration file. If this doesn't work, you may need to make the file executable: `chmod a+x slogger` from within the Slogger folder.
 2. Edit the file `slogger_config` that shows up
     - The only options will be 'storage:' and 'image_filename_is_title:'
-    - storage: should be set to either 'icloud' or a path to a
-Dropbox-synced Journal (e.g. '/Users/username/Dropbox/Apps/Day One/Journal.dayone')
+    - storage: should be one of
+        -  'icloud'
+        -  a path to a Dropbox-synced Journal (e.g. '/Users/username/Dropbox/Apps/Day One/Journal.dayone')
+        -  a path to a folder for storing markdown files and related images (if the path doesn't end in "Journal.dayone", markdown storage is triggered automatically)
     - image_filename_is_title: should be set to true or false. If true, it will use the base filename (without extension) as the title of images imported individually.
 3. Move any additional plugins you want to use from `/plugins_disabled/` into `/plugins/`.
 4. Run `./slogger` again to update the configuration file with enabled plugin options.
@@ -45,7 +68,7 @@ Dropbox-synced Journal (e.g. '/Users/username/Dropbox/Apps/Day One/Journal.dayon
 
 1. From within the Slogger folder, run `./slogger` to run the data
    capture for the plugins you have in you `/plugins/` directory. 
-2. You may run `./slogger` manually to test, or if you do not with to automate the process.
+2. You may run `./slogger` manually to test, or if you do not wish to automate the process.
 3. If you wish to automate slogger use Lingon (launchd) or other scheduling app.
 4. You can install a launchd task that will automatically run at 11:50pm every night by running `install.rb`. It's the same as Lingon would create, but all automatic and everything.
     - To uninstall the launchd task, run the command `rm ~/Library/LaunchAgents/com.brettterpstra.slogger` and then log out and back in.

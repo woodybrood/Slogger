@@ -46,22 +46,31 @@ class AppNetLogger < Slogger
       @log.info("replies: true")
     end
     output = ''
-    
+
     config['appnet_usernames'].each do |user|
       begin
         rss_feed = "https://alpha-api.app.net/feed/rss/users/@"+ user + "/posts"
-        rss_content = ""
-        open(rss_feed) do |f|
-          rss_content = f.read
+
+        url = URI.parse rss_feed
+
+        http = Net::HTTP.new url.host, url.port
+        http.verify_mode = OpenSSL::SSL::VERIFY_NONE
+        http.use_ssl = true
+
+        rss_content = nil
+
+        http.start do |agent|
+          rss_content = agent.get(url.path).read_body
         end
-                
+
         rss = RSS::Parser.parse(rss_content, true)
         feed_output = ''
         rss.items.each { |item|
           item_date = Time.parse(item.date.to_s)
           if item_date > @timespan
             content = ''
-            item.title = item.title.gsub(/^\w+?: /,'').strip    # remove username at front of post
+            item.title = item.title.gsub(/^#{user}: /,'').strip   # remove user's own name from front of post
+            item.title = item.title.gsub(/\n/,"\n    ")           # fix for multi-line posts displayed in markdown
             if item.title =~ /^@/
               if config['appnet_save_replies'] == true
                 feed_output += "* [#{item.pubDate.strftime('%I:%M %p')}](#{item.link}) #{item.title}#{content}\n"
